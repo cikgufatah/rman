@@ -1,0 +1,40 @@
+INSERT INTO rman_vars (vid, vname) VALUES (7, 'SHELLCODE_PORTS');
+INSERT INTO rman_vars (vid, vname) VALUES (8, 'HTTP_PORTS');
+INSERT INTO rman_vars (vid, vname) VALUES (9, 'ORACLE_PORTS');
+INSERT INTO rman_vars (vid, vname) VALUES (10, 'TELNET_SERVERS');
+INSERT INTO rman_vars (vid, vname) VALUES (11, 'AIM_SERVERS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (7,0,'!80','Default definition for SHELLCODE_PORTS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (8,0,'80','Default definition for HTTP_PORTS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (9,0,'1521','Default definition for ORACLE_PORTS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (10,0,'$HOME_NET','Default definition for TELNET_SERVERS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (11,0,'[64.12.24.0/24,64.12.25.0/24,64.12.26.14/24,64.12.28.0/24,64.12.29.0/24,64.12.161.0/24,64.12.163.0/24,205.188.5.0/24,205.188.9.0/24]','Default definition for AIM_SERVERS');
+ 
+CREATE TABLE `rman_preprocessors` (
+  `pid` int(11) NOT NULL auto_increment,
+  `pname` varchar(30) default NULL,
+  PRIMARY KEY  (`pid`)
+) TYPE=MyISAM;
+ 
+INSERT INTO rman_preprocessors (pid, pname) VALUES (1, 'frag2');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (2, 'stream4');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (3, 'stream4_reassemble');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (4, 'http_decode');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (5, 'rpc_decode');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (6, 'bo');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (7, 'telnet_decode');
+
+CREATE TABLE `rman_preprocessorvals` (
+  `pid` int(11) NOT NULL,
+  `sid` int(11) NOT NULL,
+  `options` varchar(255) NOT NULL,
+  `comment` varchar(255) default NULL,
+  `updated` timestamp(14) NOT NULL
+) TYPE=MyISAM;
+
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (1,0,"",'Default options for frag2');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (2,0,'detect_scans, disable_evasion_alerts','Default options for stream4');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (3,0,"",'Default options for stream4_reassemble');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (4,0,'80 -unicode -cginull','Default options for http_decode');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (5,0,'111 32771','Default options for rpc_decode');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (6,0,"",'Default options for bo');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (7,0,"",'Default options for telnet_decode');

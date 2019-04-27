@@ -1,0 +1,11 @@
+ALTER TABLE rman_sensor ADD COLUMN `ip` varchar(15) default NULL;
+ALTER TABLE rman_sensor ADD COLUMN `public_key` varchar(255) default NULL;
+
+CREATE TABLE `rman_sensor_status` (
+  `sid` int(11) NOT NULL default '0',
+  `statusflag` int(11) default NULL,
+  `lastlog` text,
+  `lastcheck` timestamp(14) NOT NULL,
+  `lastupdate` timestamp(14) NOT NULL,
+  PRIMARY KEY  (`sid`)
+  ) TYPE=MyISAM;

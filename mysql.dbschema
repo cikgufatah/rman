@@ -1,0 +1,151 @@
+SET SQL_MODE='ALLOW_INVALID_DATES';
+
+drop table rman_sensor;
+drop table sensor;
+drop table rman_sensor_status;
+drop table rman_rgroup;
+drop table rman_rules;
+drop table rman_rrgid;
+drop table rman_senrgrp;
+drop table rman_vars;
+drop table rman_varvals;
+drop table rman_preprocessors;
+drop table rman_preprocessorvals;
+
+CREATE TABLE `rman_sensor` (
+  `sid` int(11) NOT NULL default '0',
+  `updated` timestamp,
+  `active` enum('Y','N') default NULL,
+  `ip` varchar(255) default NULL,
+  `public_key` varchar(255) default NULL,
+  PRIMARY KEY  (`sid`)
+);
+
+CREATE TABLE `sensor` (
+  `sid` int(11) NOT NULL default '0',
+  `updated` timestamp,
+  `interface` varchar(255) default NULL,
+  `hostname` varchar(255) default NULL,
+  PRIMARY KEY  (`sid`)
+);
+
+INSERT INTO sensor VALUES(1, null, 'ens33', 'cids');
+
+CREATE TABLE `rman_sensor_status` (
+  `sid` int(11) NOT NULL default '0',
+  `statusflag` int(11) default NULL,
+  `lastlog` text,
+  `lastcheck` timestamp,
+  `lastupdate` timestamp,
+  PRIMARY KEY  (`sid`)
+);
+
+CREATE TABLE `rman_rgroup` (
+  `rgid` int(11) NOT NULL auto_increment,
+  `name` varchar(255) default NULL,
+  `description` varchar(255) default NULL,
+  `updated` timestamp,
+  PRIMARY KEY  (`rgid`)
+);
+
+CREATE TABLE `rman_rules` (
+  `rid` int(11) NOT NULL auto_increment,
+  `name` varchar(255) default NULL,
+  `active` enum('Y','N') default NULL,
+  `rev` int(11) default NULL,
+  `updated` timestamp,
+  `created` timestamp,
+  `action` varchar(255) default NULL,
+  `proto` varchar(255) default NULL,
+  `s_ip` varchar(255) default NULL,
+  `s_port` varchar(255) default NULL,
+  `dir` enum('->','<-','<>') default NULL,
+  `d_ip` varchar(255) default NULL,
+  `d_port` varchar(255) default NULL,
+  `options` blob,
+  PRIMARY KEY  (`rid`)
+); 
+
+ALTER TABLE rman_rules AUTO_INCREMENT=1000000;
+
+CREATE TABLE `rman_rrgid` (
+  `rid` int(11) default NULL,
+  `rgid` int(11) default NULL,
+  KEY `idx_rid` (`rid`)
+);
+
+CREATE TABLE `rman_senrgrp` (
+  `sid` int(11) default NULL,
+  `rgid` int(11) default NULL
+);
+
+CREATE TABLE `rman_vars` (
+  `vid` int(11) NOT NULL auto_increment,
+  `vname` varchar(255) default NULL,
+  PRIMARY KEY  (`vid`)
+);
+
+INSERT INTO rman_vars (vid, vname) VALUES (1, 'HOME_NET');
+INSERT INTO rman_vars (vid, vname) VALUES (2, 'EXTERNAL_NET');
+INSERT INTO rman_vars (vid, vname) VALUES (3, 'HTTP_SERVERS');
+INSERT INTO rman_vars (vid, vname) VALUES (4, 'SQL_SERVERS');
+INSERT INTO rman_vars (vid, vname) VALUES (5, 'SMTP');
+INSERT INTO rman_vars (vid, vname) VALUES (6, 'DNS_SERVERS');
+INSERT INTO rman_vars (vid, vname) VALUES (7, 'SHELLCODE_PORTS');
+INSERT INTO rman_vars (vid, vname) VALUES (8, 'HTTP_PORTS');
+INSERT INTO rman_vars (vid, vname) VALUES (9, 'ORACLE_PORTS');
+INSERT INTO rman_vars (vid, vname) VALUES (10, 'TELNET_SERVERS');
+INSERT INTO rman_vars (vid, vname) VALUES (11, 'AIM_SERVERS');
+
+ALTER TABLE rman_vars AUTO_INCREMENT=100;
+
+CREATE TABLE `rman_varvals` (
+  `vid` int(11) NOT NULL,
+  `sid` int(11) NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `comment` varchar(255) default NULL,
+  `updated` timestamp
+);
+
+# Insert defaults for sensor '0' i.e. default sensor
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (1,0,'any','Default definition for HOME_NET');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (2,0,'any','Default definition for EXTERNAL_NET');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (3,0,'$HOME_NET','Default definition for HTTP_SERVERS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (4,0,'$HOME_NET','Default definition for SQL_SERVERS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (5,0,'$HOME_NET','Default definition for SMTP');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (6,0,'$HOME_NET','Default definition for DNS_SERVERS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (7,0,'!80','Default definition for SHELLCODE_PORTS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (8,0,'80','Default definition for HTTP_PORTS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (9,0,'1521','Default definition for ORACLE_PORTS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (10,0,'$HOME_NET','Default definition for TELNET_SERVERS');
+INSERT INTO rman_varvals (vid, sid, value, comment) VALUES (11,0,'[64.12.24.0/24,64.12.25.0/24,64.12.26.14/24,64.12.28.0/24,64.12.29.0/24,64.12.161.0/24,64.12.163.0/24,205.188.5.0/24,205.188.9.0/24]','Default definition for AIM_SERVERS');
+
+CREATE TABLE `rman_preprocessors` (
+  `pid` int(11) NOT NULL auto_increment,
+  `pname` varchar(255) default NULL,
+  PRIMARY KEY  (`pid`)
+);
+
+INSERT INTO rman_preprocessors (pid, pname) VALUES (1, 'frag2');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (2, 'stream4');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (3, 'stream4_reassemble');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (4, 'http_decode');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (5, 'rpc_decode');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (6, 'bo');
+INSERT INTO rman_preprocessors (pid, pname) VALUES (7, 'telnet_decode');
+
+CREATE TABLE `rman_preprocessorvals` (
+  `pid` int(11) NOT NULL,
+  `sid` int(11) NOT NULL,
+  `options` varchar(255) NOT NULL,
+  `comment` varchar(255) default NULL,
+  `updated` timestamp
+);
+
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (1,0,"",'Default options for frag2');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (2,0,'detect_scans, disable_evasion_alerts','Default options for stream4');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (3,0,"",'Default options for stream4_reassemble');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (4,0,'80 -unicode -cginull','Default options for http_decode');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (5,0,'111 32771','Default options for rpc_decode');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (6,0,"",'Default options for bo');
+INSERT INTO rman_preprocessorvals (pid, sid, options, comment) VALUES (7,0,"",'Default options for telnet_decode');
